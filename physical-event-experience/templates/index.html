@@ -49,28 +49,76 @@
 
             <div class="view-container" id="view-dashboard">
                 <!-- KPI Widgets (Will populate dynamically) -->
+                <!-- Main KPI Cards Sections -->
                 <div class="kpi-grid">
-                    <div class="kpi-card glass-panel">
-                        <div class="kpi-icon"><i data-lucide="users"></i></div>
-                        <div class="kpi-details">
-                            <h3>Total Occupancy</h3>
-                            <div class="kpi-value" id="kpi-occupancy">--</div>
+                    
+                    <!-- Crowd Density Card -->
+                    <div class="kpi-card glass-panel interactive-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon"><i data-lucide="users"></i></div>
+                            <h3>Crowd Density</h3>
+                        </div>
+                        <div class="kpi-body">
+                            <div class="kpi-value"><span id="kpi-occupancy">--</span> <span class="kpi-subtext">/ <span id="kpi-capacity">--</span></span></div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="density-bar"></div>
+                            </div>
+                            <p class="kpi-hint" id="density-hint">Calculating...</p>
                         </div>
                     </div>
-                    <div class="kpi-card glass-panel">
-                        <div class="kpi-icon"><i data-lucide="clock"></i></div>
-                        <div class="kpi-details">
-                            <h3>Avg Wait Time</h3>
-                            <div class="kpi-value" id="kpi-wait">--</div>
+
+                    <!-- Shortest Wait Time Card -->
+                    <div class="kpi-card glass-panel interactive-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon"><i data-lucide="clock"></i></div>
+                            <h3>Fastest Gate</h3>
+                        </div>
+                        <div class="kpi-body">
+                            <div class="kpi-value" id="kpi-fastest-time">-- <span class="kpi-subtext">mins</span></div>
+                            <div class="kpi-chip" id="kpi-fastest-gate">Loading...</div>
                         </div>
                     </div>
-                    <div class="kpi-card glass-panel">
-                        <div class="kpi-icon warning"><i data-lucide="alert-triangle"></i></div>
-                        <div class="kpi-details">
-                            <h3>Congested Areas</h3>
+
+                    <!-- Congestion Alerts Card -->
+                    <div class="kpi-card glass-panel interactive-card" id="congestion-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon warning"><i data-lucide="alert-triangle"></i></div>
+                            <h3>Congested Zones</h3>
+                        </div>
+                        <div class="kpi-body">
                             <div class="kpi-value" id="kpi-congestion">--</div>
+                            <p class="kpi-hint">Zones at >70% capacity</p>
                         </div>
                     </div>
+                </div>
+
+                <!-- Smart Navigation Section -->
+                <h3 class="section-title">Smart Navigation Quick Actions</h3>
+                <div class="nav-actions-grid">
+                    <button class="nav-action-card glass-panel interactive-card" data-route="exit">
+                        <div class="nav-action-icon"><i data-lucide="log-out"></i></div>
+                        <div class="nav-action-text">
+                            <h4>Fastest Exit</h4>
+                            <p id="nav-exit-time">Est. 3 min</p>
+                        </div>
+                        <i data-lucide="chevron-right" class="chevron"></i>
+                    </button>
+                    <button class="nav-action-card glass-panel interactive-card" data-route="restroom">
+                        <div class="nav-action-icon"><i data-lucide="droplet"></i></div>
+                        <div class="nav-action-text">
+                            <h4>Nearest Restroom</h4>
+                            <p>Est. 1 min</p>
+                        </div>
+                        <i data-lucide="chevron-right" class="chevron"></i>
+                    </button>
+                    <button class="nav-action-card glass-panel interactive-card" data-route="food">
+                        <div class="nav-action-icon"><i data-lucide="pizza"></i></div>
+                        <div class="nav-action-text">
+                            <h4>Food & Drink</h4>
+                            <p>Est. 4 min</p>
+                        </div>
+                        <i data-lucide="chevron-right" class="chevron"></i>
+                    </button>
                 </div>
 
                 <!-- Charts Section -->

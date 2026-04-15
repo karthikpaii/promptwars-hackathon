@@ -39,6 +39,14 @@ document.addEventListener('DOMContentLoaded', () => {
     tabs.dashboard.addEventListener('click', (e) => { e.preventDefault(); switchView('dashboard'); });
     tabs.map.addEventListener('click', (e) => { e.preventDefault(); switchView('map'); });
 
+    // Navigation Quick Actions
+    document.querySelectorAll('.nav-action-card').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Right now, we just switch to the map view. In a real app we'd trigger routing.
+            switchView('map');
+        });
+    });
+
     // Data Fetching Logic
     async function fetchData() {
         try {
@@ -55,18 +63,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateUI(data) {
-        // KPI Updates
+        // --- Crowd Density Card Updates ---
         document.getElementById('kpi-occupancy').textContent = data.occupancy.toLocaleString();
+        document.getElementById('kpi-capacity').textContent = data.capacity.toLocaleString();
         
-        const avgWait = Math.round(data.gates.reduce((acc, g) => acc + g.waitTimeMinutes, 0) / data.gates.length);
-        document.getElementById('kpi-wait').textContent = `${avgWait}m`;
+        const densityPercent = Math.min(100, Math.round((data.occupancy / data.capacity) * 100));
+        const densityBar = document.getElementById('density-bar');
+        densityBar.style.width = `${densityPercent}%`;
         
-        const congestionCount = data.zones.filter(z => z.crowdLevel > 70).length;
-        document.getElementById('kpi-congestion').textContent = congestionCount;
+        // Change color based on density
+        if (densityPercent > 90) densityBar.style.backgroundColor = 'var(--danger)';
+        else if (densityPercent > 70) densityBar.style.backgroundColor = 'var(--warning)';
+        else densityBar.style.backgroundColor = 'var(--success)';
+        
+        document.getElementById('density-hint').textContent = `Stadium is ${densityPercent}% full`;
+
+        // --- Fastest Gate Updates ---
+        const fastestGate = data.gates.reduce((prev, current) => (prev.waitTimeMinutes < current.waitTimeMinutes) ? prev : current);
+        document.getElementById('kpi-fastest-time').textContent = fastestGate.waitTimeMinutes;
+        document.getElementById('kpi-fastest-gate').textContent = fastestGate.name;
+
+        // --- Congestion Card Updates ---
+        const congestionZones = data.zones.filter(z => z.crowdLevel > 70);
+        document.getElementById('kpi-congestion').textContent = congestionZones.length;
+        
+        const congestionCard = document.getElementById('congestion-card');
+        if (congestionZones.length > 0) {
+            congestionCard.style.border = '1px solid var(--danger)';
+        } else {
+            congestionCard.style.border = '1px solid var(--panel-border)';
+        }
         
         // Update subtitle with timestamp
         const timeStr = new Date(data.timestamp * 1000).toLocaleTimeString();
         document.querySelector('.subtitle').textContent = `Live Stats - Last updated: ${timeStr}`;
+        
+        // (Optional) simulate routing estimates changing slightly
+        document.getElementById('nav-exit-time').textContent = `Est. ${fastestGate.waitTimeMinutes + 2} min`;
     }
 
     // Initial fetch and set interval
