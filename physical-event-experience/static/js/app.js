@@ -39,13 +39,38 @@ document.addEventListener('DOMContentLoaded', () => {
     tabs.dashboard.addEventListener('click', (e) => { e.preventDefault(); switchView('dashboard'); });
     tabs.map.addEventListener('click', (e) => { e.preventDefault(); switchView('map'); });
 
-    // Navigation Quick Actions
+    // Navigation Quick Actions Logic
     document.querySelectorAll('.nav-action-card').forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Right now, we just switch to the map view. In a real app we'd trigger routing.
+        btn.addEventListener('click', (e) => {
+            const routeType = e.currentTarget.dataset.route; // 'exit', 'restroom', 'food'
             switchView('map');
+            
+            // Wait slightly for map view transition before routing
+            setTimeout(() => {
+                let dest = 'FoodCourt'; // default
+                if (routeType === 'exit') dest = 'NorthGate'; // mock fastest gate
+                else if (routeType === 'restroom') dest = 'MerchStand'; // Mock nearby node
+                else if (routeType === 'food') dest = 'FoodCourt';
+                
+                // Route from generic 'Your Seat' (Center) to destination
+                window.calculateAndDrawRoute('Center', dest);
+                
+                // Also update the select dropdowns visually
+                document.getElementById('route-start').value = 'Center';
+                document.getElementById('route-end').value = dest;
+            }, 150);
         });
     });
+
+    // Map Specific Routing Panel
+    const routeButton = document.getElementById('btn-draw-route');
+    if (routeButton) {
+        routeButton.addEventListener('click', () => {
+            const start = document.getElementById('route-start').value;
+            const end = document.getElementById('route-end').value;
+            window.calculateAndDrawRoute(start, end);
+        });
+    }
 
     // Data Fetching Logic
     async function fetchData() {

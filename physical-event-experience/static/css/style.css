@@ -573,6 +573,26 @@ path.leaflet-interactive.smooth-transition-path {
     transition: fill 1s ease-in-out, stroke 1s ease-in-out;
 }
 
+.map-label {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-shadow: 0 0 4px #000, 0 0 8px #000; /* Outline effect so it's readable over any color */
+}
+
+.gate-label {
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: none;
+    color: white;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 900px) {
     .dashboard-grid {
