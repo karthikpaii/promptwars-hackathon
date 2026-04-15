@@ -73,6 +73,10 @@ def advance_simulation():
          })
 
 @app.route("/")
+def home():
+    return render_template("portal.html")
+
+@app.route("/dashboard")
 def index():
     return render_template("index.html")
 
@@ -121,5 +125,9 @@ def dispatch():
         return jsonify({"status": "success"})
     return jsonify({"status": "error", "message": "No available staff units"})
 
+import os
+
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    # Cloud Run provides the PORT environment variable. Default to 8080.
+    port = int(os.environ.get("PORT", 8080))
+    app.run(debug=False, host="0.0.0.0", port=port)

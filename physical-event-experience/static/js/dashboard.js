@@ -27,39 +27,7 @@ function initCharts() {
         }
     });
 
-    return gateChart;
-}
-
-function updateList(containerId, items, renderRow) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    // Use a DocumentFragment for efficient bulk updates if many items added
-    let needsIconRefresh = false;
-
-    items.forEach(item => {
-        let row = container.querySelector(`[data-id="${item.id}"]`);
-        if (!row) {
-            row = document.createElement('div');
-            row.className = 'zone-row';
-            row.setAttribute('data-id', item.id);
-            container.appendChild(row);
-            needsIconRefresh = true;
-        }
-        row.innerHTML = renderRow(item);
-    });
-
-    // Cleanup items that no longer exist
-    const currentIds = items.map(i => i.id);
-    container.querySelectorAll('.zone-row').forEach(row => {
-        if (!currentIds.includes(row.getAttribute('data-id'))) {
-            row.remove();
-        }
-    });
-
-    if (needsIconRefresh && window.lucide) {
-        window.lucide.createIcons({ root: container });
-    }
+    // The zone list requires no init logic as it's built dynamically in updateCharts
 }
 
 function updateCharts(data) {
@@ -75,45 +43,68 @@ function updateCharts(data) {
     gateChart.update('none'); 
 
     // Update Live Zone Status List
-    const sortedZones = [...data.zones].sort((a,b) => b.crowdLevel - a.crowdLevel);
-    updateList('zone-status-list', sortedZones, (zone) => {
-        let colorClass = 'green';
-        let statusText = 'Clear';
-        if (zone.crowdLevel > 80) { colorClass = 'red'; statusText = 'Severe'; }
-        else if (zone.crowdLevel > 50) { colorClass = 'yellow'; statusText = 'Moderate'; }
+    const zoneListContainer = document.getElementById('zone-status-list');
+    if(zoneListContainer) {
+        zoneListContainer.innerHTML = '';
+        const sortedZones = [...data.zones].sort((a,b) => b.crowdLevel - a.crowdLevel);
 
-        return `
-            <div class="zone-info">
-                <span class="zone-name">${zone.name}</span>
-                <span class="zone-meta">${zone.crowdLevel}% Capacity</span>
-            </div>
-            <div class="zone-indicator-wrapper">
-                <span class="zone-meta">${statusText}</span>
-                <div class="zone-status-ball ${colorClass}"></div>
-            </div>
-        `;
-    });
+        sortedZones.forEach(zone => {
+            const row = document.createElement('div');
+            row.className = 'zone-row';
+            
+            let colorClass = 'green';
+            let statusText = 'Clear';
+            if (zone.crowdLevel > 80) { colorClass = 'red'; statusText = 'Severe'; }
+            else if (zone.crowdLevel > 50) { colorClass = 'yellow'; statusText = 'Moderate'; }
+
+            row.innerHTML = `
+                <div class="zone-info">
+                    <span class="zone-name">${zone.name}</span>
+                    <span class="zone-meta">${zone.crowdLevel}% Capacity</span>
+                </div>
+                <div class="zone-indicator-wrapper">
+                    <span class="zone-meta">${statusText}</span>
+                    <div class="zone-status-ball ${colorClass}"></div>
+                </div>
+            `;
+            zoneListContainer.appendChild(row);
+        });
+    }
 
     // Update Amenities Queues List
-    const sortedAmenities = [...data.amenities].sort((a,b) => b.waitTimeMinutes - a.waitTimeMinutes);
-    updateList('amenity-status-list', sortedAmenities, (amenity) => {
-        let colorClass = 'green';
-        let statusText = 'Short';
-        if (amenity.waitTimeMinutes > 15) { colorClass = 'red'; statusText = 'Long'; }
-        else if (amenity.waitTimeMinutes > 5) { colorClass = 'yellow'; statusText = 'Med'; }
+    const amenityListContainer = document.getElementById('amenity-status-list');
+    if(amenityListContainer && data.amenities) {
+        amenityListContainer.innerHTML = '';
+        const sortedAmenities = [...data.amenities].sort((a,b) => b.waitTimeMinutes - a.waitTimeMinutes);
 
-        const iconClass = amenity.type === 'restroom' ? 'droplet' : 'pizza';
-        return `
-            <div class="zone-info" style="flex-direction:row; gap:8px; align-items:center;">
-                <i data-lucide="${iconClass}" style="width:16px; height:16px; color:var(--text-muted);"></i>
-                <span class="zone-name">${amenity.name}</span>
-            </div>
-            <div class="zone-indicator-wrapper">
-                <span class="zone-meta">${amenity.waitTimeMinutes}m (${statusText})</span>
-                <div class="zone-status-ball ${colorClass}"></div>
-            </div>
-        `;
-    });
+        sortedAmenities.forEach(amenity => {
+            const row = document.createElement('div');
+            row.className = 'zone-row';
+            
+            let colorClass = 'green';
+            let statusText = 'Short';
+            if (amenity.waitTimeMinutes > 15) { colorClass = 'red'; statusText = 'Long'; }
+            else if (amenity.waitTimeMinutes > 5) { colorClass = 'yellow'; statusText = 'Med'; }
+
+            const iconClass = amenity.type === 'restroom' ? 'droplet' : 'pizza';
+
+            row.innerHTML = `
+                <div class="zone-info" style="flex-direction:row; gap:8px; align-items:center;">
+                    <i data-lucide="${iconClass}" style="width:16px; height:16px; color:var(--text-muted);"></i>
+                    <span class="zone-name">${amenity.name}</span>
+                </div>
+                <div class="zone-indicator-wrapper">
+                    <span class="zone-meta">${amenity.waitTimeMinutes}m (${statusText})</span>
+                    <div class="zone-status-ball ${colorClass}"></div>
+                </div>
+            `;
+            amenityListContainer.appendChild(row);
+        });
+        
+        if(window.lucide) {
+            window.lucide.createIcons({root: amenityListContainer});
+        }
+    }
 }
 
 window.initCharts = initCharts;

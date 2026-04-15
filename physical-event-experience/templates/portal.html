@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StadiumIQ | Mission Control Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .portal-body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .portal-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .portal-container {
+            max-width: 1000px;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .portal-header {
+            margin-bottom: 4rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .portal-header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .portal-header p {
+            color: #94a3b8;
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2.5rem;
+            perspective: 1000px;
+        }
+
+        .portal-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            padding: 3rem;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeInUp 0.8s ease backwards;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .portal-card .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            color: #3b82f6;
+            transition: all 0.3s ease;
+        }
+
+        .portal-card:hover .icon-wrapper {
+            background: #3b82f6;
+            color: white;
+            transform: rotate(-5deg);
+        }
+
+        .portal-card h2 {
+            font-size: 1.75rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .portal-card p {
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .launch-btn {
+            background: #3b82f6;
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .portal-card:hover .launch-btn {
+            background: #2563eb;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .card-admin .icon-wrapper { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+        .card-admin:hover .icon-wrapper { background: #f59e0b; }
+        .card-admin:hover { border-color: rgba(245, 158, 11, 0.4); }
+        .card-admin .launch-btn { background: #f59e0b; }
+        .card-admin:hover .launch-btn { background: #d97706; box-shadow: 0 0 20px rgba(217, 119, 6, 0.4); }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .portal-grid { grid-template-columns: 1fr; }
+            .portal-card { padding: 2rem; }
+            .portal-header h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body class="portal-body">
+    <div class="portal-glow"></div>
+    
+    <div class="portal-container">
+        <header class="portal-header">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;">
+                <i data-lucide="zap" style="width:48px; height:48px; color: #3b82f6;"></i>
+                <span style="font-size: 2rem; font-weight: 800; color: white;">StadiumIQ</span>
+            </div>
+            <h1>Mission Control</h1>
+            <p>Welcome to the ultimate real-time crowd management ecosystem. Select an interface to begin exploration.</p>
+        </header>
+
+        <main class="portal-grid">
+            <!-- Attendee Card -->
+            <a href="/dashboard" class="portal-card" style="animation-delay: 0.1s;">
+                <div class="icon-wrapper">
+                    <i data-lucide="users" style="width:40px; height:40px;"></i>
+                </div>
+                <h2>Attendee Dashboard</h2>
+                <p>Explore live stadium metrics, navigate with the smart pathfinder, and stay informed with real-time alerts.</p>
+                <div class="launch-btn">
+                    Launch Experience <i data-lucide="arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- Admin Card -->
+            <a href="/admin" class="portal-card card-admin" style="animation-delay: 0.2s;">
+                <div class="icon-wrapper">
+                    <i data-lucide="shield" style="width:40px; height:40px;"></i>
+                </div>
+                <h2>Command Center</h2>
+                <p>Manage venue operations, broadcast global announcements, and coordinate emergency staff units in real-time.</p>
+                <div class="launch-btn">
+                    Launch Backend <i data-lucide="external-link"></i>
+                </div>
+            </a>
+        </main>
+
+        <footer style="margin-top: 4rem; color: #475569; font-size: 0.9rem;">
+            &copy; 2026 StadiumIQ Smart Venue Solution. Built for the Future of Sporting Events.
+        </footer>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

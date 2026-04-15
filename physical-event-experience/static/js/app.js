@@ -102,15 +102,15 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="toast-close"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
         `;
         
-        toast.querySelector('.toast-close').addEventListener('click', dismissToast);
+        const closeBtn = toast.querySelector('.toast-close');
+        if (closeBtn) closeBtn.addEventListener('click', dismissToast);
         
-        container.insertBefore(toast, container.firstChild);
+        container.insertBefore(toast, container.firstChild); 
         if(window.lucide) window.lucide.createIcons({root: toast});
 
         // Add to persistent History Feed on the Alerts Tab
         const feedContainer = document.getElementById('alert-history-feed');
         if (feedContainer) {
-            // Remove empty state if it's there
             const emptyState = feedContainer.querySelector('.empty-state');
             if (emptyState) emptyState.remove();
 
@@ -168,14 +168,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Data Fetching Logic
     async function fetchData() {
-        const overlay = document.getElementById('offline-overlay');
         try {
             const response = await fetch('/api/status');
             const data = await response.json();
             
-            if (overlay) overlay.classList.add('hidden');
-
-            processAlerts(data); // Safely execute alerts BEFORE UI
+            processAlerts(data); 
             
             updateUI(data);
             window.updateMap(data);
@@ -183,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
         } catch (error) {
             console.error('Error fetching stadium status:', error);
-            if (overlay) overlay.classList.remove('hidden');
         }
     }
 
@@ -221,13 +217,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Update subtitle with timestamp
         const timeStr = new Date(data.timestamp * 1000).toLocaleTimeString();
-        document.querySelector('.subtitle').textContent = `Live Stats - Last updated: ${timeStr}`;
+        const subtitle = document.querySelector('.subtitle');
+        if (subtitle) subtitle.textContent = `Live Stats - Last updated: ${timeStr}`;
         
         // (Optional) simulate routing estimates changing slightly
-        document.getElementById('nav-exit-time').textContent = `Est. ${fastestGate.waitTimeMinutes + 2} min`;
+        const navTime = document.getElementById('nav-exit-time');
+        if(navTime) navTime.textContent = `Est. ${fastestGate.waitTimeMinutes + 2} min`;
     }
 
     // Initial fetch and set interval
     fetchData();
-    setInterval(fetchData, 3000); // Update every 3 seconds for that "real-time" feel
+    setInterval(fetchData, 3000); 
 });
