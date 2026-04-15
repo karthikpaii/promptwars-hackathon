@@ -53,23 +53,6 @@ def advance_simulation():
     for num, amenity in enumerate(simulation_state["amenities"]):
         drift = random.randint(-2, 2)
         amenity["waitTimeMinutes"] = max(0, min(30, amenity["waitTimeMinutes"] + drift))
-        
-    # Occasional Random Global Emergency Alert
-    if "alerts" not in simulation_state:
-        simulation_state["alerts"] = []
-    
-    # Randomly clear alerts
-    if len(simulation_state["alerts"]) > 0 and random.random() < 0.2:
-        simulation_state["alerts"].pop(0)
-
-    # 10% chance to generate a global alert on a tick
-    if random.random() < 0.1 and len(simulation_state["alerts"]) == 0:
-        emergencies = [
-            {"id": str(time.time()), "message": "Medical personnel dispatched to Center Concourse.", "type": "danger"},
-            {"id": str(time.time()), "message": "Merch Stand temporarily closed for restocking.", "type": "warning"},
-            {"id": str(time.time()), "message": "Security incident near VIP Lounge. Avoid the area.", "type": "danger"},
-        ]
-        simulation_state["alerts"].append(random.choice(emergencies))
 
 @app.route("/")
 def index():
@@ -85,8 +68,7 @@ def status():
         "capacity": simulation_state["capacity"],
         "gates": simulation_state["gates"],
         "zones": simulation_state["zones"],
-        "amenities": simulation_state["amenities"],
-        "alerts": simulation_state.get("alerts", [])
+        "amenities": simulation_state["amenities"]
     })
 
 if __name__ == "__main__":
