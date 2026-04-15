@@ -16,6 +16,18 @@
 </head>
 <body class="dark-theme">
     
+    <!-- Connection Status Overlay -->
+    <div id="offline-overlay" class="offline-overlay hidden">
+        <div class="offline-content">
+            <i data-lucide="wifi-off"></i>
+            <h3>Connection Lost</h3>
+            <p>Attempting to reconnect to stadium servers...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
     <div class="app-layout">
         <!-- Sidebar / Bottom Nav -->
         <nav class="main-nav">
@@ -175,6 +187,20 @@
                         <button id="btn-draw-route" class="btn-primary">Find Best Path</button>
                     </div>
                     <div id="stadium-map"></div>
+                </div>
+            </div>
+
+            <div class="view-container hidden" id="view-alerts">
+                <div class="glass-panel alerts-panel">
+                    <h3>Notification Center</h3>
+                    <p class="subtitle" style="margin-bottom: 1.5rem;">Chronological history of all stadium alerts.</p>
+                    <div id="alert-history-feed" class="alert-feed">
+                        <!-- History items dynamically inject here -->
+                        <div class="empty-state" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                            <i data-lucide="check-circle" style="width:32px; height:32px; opacity: 0.5; margin-bottom: 0.5rem;"></i>
+                            <p>No alerts recorded yet.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 

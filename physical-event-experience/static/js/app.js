@@ -6,12 +6,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Navigation Logic
     const tabs = {
         'dashboard': document.getElementById('tab-dashboard'),
-        'map': document.getElementById('tab-map')
+        'map': document.getElementById('tab-map'),
+        'alerts': document.getElementById('tab-alerts')
     };
 
     const views = {
         'dashboard': document.getElementById('view-dashboard'),
-        'map': document.getElementById('view-map')
+        'map': document.getElementById('view-map'),
+        'alerts': document.getElementById('view-alerts')
     };
 
     function switchView(viewName) {
@@ -38,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tabs.dashboard.addEventListener('click', (e) => { e.preventDefault(); switchView('dashboard'); });
     tabs.map.addEventListener('click', (e) => { e.preventDefault(); switchView('map'); });
+    tabs.alerts.addEventListener('click', (e) => { e.preventDefault(); switchView('alerts'); });
 
     // Navigation Quick Actions Logic
     document.querySelectorAll('.nav-action-card').forEach(btn => {
@@ -72,11 +75,107 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Real-time Alert Engine ---
+    const activeAlerts = new Set(); 
+
+    function showToast(title, message, type = 'warning') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        const iconName = type === 'danger' ? 'alert-triangle' : 'info';
+
+        let autoDismissTimer;
+        const dismissToast = () => {
+            clearTimeout(autoDismissTimer);
+            toast.classList.add('removing');
+            setTimeout(() => toast.remove(), 300);
+        };
+
+        toast.innerHTML = `
+            <div class="toast-icon"><i data-lucide="${iconName}" style="width:20px; height:20px;"></i></div>
+            <div class="toast-content">
+                <span class="toast-title">${title}</span>
+                <span class="toast-message">${message}</span>
+            </div>
+            <button class="toast-close"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+        `;
+        
+        toast.querySelector('.toast-close').addEventListener('click', dismissToast);
+        
+        container.insertBefore(toast, container.firstChild);
+        if(window.lucide) window.lucide.createIcons({root: toast});
+
+        // Add to persistent History Feed on the Alerts Tab
+        const feedContainer = document.getElementById('alert-history-feed');
+        if (feedContainer) {
+            // Remove empty state if it's there
+            const emptyState = feedContainer.querySelector('.empty-state');
+            if (emptyState) emptyState.remove();
+
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            const historyItem = document.createElement('div');
+            historyItem.className = `alert-feed-item ${type}`;
+            historyItem.innerHTML = `
+                <div class="toast-icon">
+                    <i data-lucide="${iconName}" style="width:24px; height:24px; color: var(--${type === 'danger' ? 'danger' : 'warning'});"></i>
+                </div>
+                <div class="alert-body">
+                    <h4>${title}</h4>
+                    <p>${message}</p>
+                </div>
+                <div class="alert-time">${timeStr}</div>
+            `;
+            feedContainer.insertBefore(historyItem, feedContainer.firstChild); // Prepend to top
+            if(window.lucide) window.lucide.createIcons({root: historyItem});
+        }
+
+        autoDismissTimer = setTimeout(dismissToast, 6000);
+    }
+
+    function processAlerts(data) {
+        data.zones.forEach(zone => {
+            if (zone.crowdLevel > 85) {
+                const alertKey = `zone-${zone.id}-hi`;
+                if (!activeAlerts.has(alertKey)) {
+                    showToast('Zone Overcrowded!', `DO NOT ENTER ${zone.name.toUpperCase()}. Capacity is severe.`, 'danger');
+                    activeAlerts.add(alertKey);
+                }
+            } else { activeAlerts.delete(`zone-${zone.id}-hi`); }
+        });
+
+        data.gates.forEach(gate => {
+            if (gate.waitTimeMinutes > 25) {
+                const alertKey = `gate-${gate.id}-hi`;
+                if (!activeAlerts.has(alertKey)) {
+                    showToast('Gate Delay', `Severe delays at ${gate.name} (${gate.waitTimeMinutes}m wait). Consider another exit.`, 'warning');
+                    activeAlerts.add(alertKey);
+                }
+            } else { activeAlerts.delete(`gate-${gate.id}-hi`); }
+        });
+
+        if (data.alerts && data.alerts.length > 0) {
+            data.alerts.forEach(alert => {
+                if(!activeAlerts.has(`global-${alert.id}`)) {
+                    showToast('Stadium Alert', alert.message, alert.type);
+                    activeAlerts.add(`global-${alert.id}`);
+                }
+            });
+        }
+    }
+
     // Data Fetching Logic
     async function fetchData() {
+        const overlay = document.getElementById('offline-overlay');
         try {
             const response = await fetch('/api/status');
             const data = await response.json();
+            
+            if (overlay) overlay.classList.add('hidden');
+
+            processAlerts(data); // Safely execute alerts BEFORE UI
             
             updateUI(data);
             window.updateMap(data);
@@ -84,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
         } catch (error) {
             console.error('Error fetching stadium status:', error);
+            if (overlay) overlay.classList.remove('hidden');
         }
     }
 

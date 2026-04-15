@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Control Center - StadiumIQ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .admin-layout {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .admin-card {
+            padding: 1.5rem;
+        }
+        textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            color: white;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            resize: none;
+            font-family: inherit;
+        }
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .staff-status {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .staff-stat {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem 2rem;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+        }
+        .staff-stat h4 { margin: 0; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; }
+        .staff-stat .value { font-size: 2rem; font-weight: 700; color: var(--accent); }
+        
+        .zone-control-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .zone-control-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+        }
+        .zone-meta { color: var(--text-muted); font-size: 0.8rem; }
+        .dispatch-btns { display: flex; gap: 0.5rem; }
+        .btn-small { padding: 0.4rem 0.8rem; font-size: 0.75rem; }
+    </style>
+</head>
+<body class="dark-theme">
+    <div class="admin-layout">
+        <header class="top-header">
+            <div class="header-title">
+                <h1>Admin Command Center</h1>
+                <p class="subtitle">Manual Override & Staff Coordination</p>
+            </div>
+            <div class="header-actions">
+                <a href="/" class="btn-primary" style="text-decoration:none; display:inline-block;">View Attendee App</a>
+            </div>
+        </header>
+
+        <div class="staff-status">
+            <div class="staff-stat">
+                <h4>Security Units Avail.</h4>
+                <div class="value" id="avail-security">--</div>
+            </div>
+            <div class="staff-stat">
+                <h4>Medical Units Avail.</h4>
+                <div class="value" id="avail-medical">--</div>
+            </div>
+            <div class="staff-stat">
+                <h4>Total Occupancy</h4>
+                <div class="value" id="total-occ">--</div>
+            </div>
+        </div>
+
+        <div class="admin-grid">
+            <div class="control-panel">
+                <!-- Manual Broadcast -->
+                <div class="admin-card glass-panel">
+                    <h3>Manual Broadcast Alert</h3>
+                    <p class="subtitle">Type a message to send a live notification to all users.</p>
+                    <textarea id="broadcast-msg" rows="4" placeholder="Enter message here..."></textarea>
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="sendBroadcast('info')">Send Info</button>
+                        <button class="btn-primary" style="background:var(--warning);" onclick="sendBroadcast('warning')">Send Warning</button>
+                        <button class="btn-primary" style="background:var(--danger);" onclick="sendBroadcast('danger')">Send Emergency</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="zone-dispatch glass-panel admin-card">
+                <h3>Zone Management & Dispatch</h3>
+                <p class="subtitle">Monitor congestion and send teams to specific locations.</p>
+                <div class="zone-control-list" id="zone-list">
+                    <!-- Dynamic Zones -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="/static/js/admin.js"></script>
+</body>
+</html>
