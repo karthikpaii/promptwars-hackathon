@@ -31,11 +31,22 @@ StadiumIQ is a cutting-edge, real-time crowd management and navigation ecosystem
 - **Deployment:** Docker & Gunicorn
 - **Styling:** Premium UI with dynamic gradients and micro-animations
 
+## Demo 🌐
+- **Home Page:** https://smart-stadium-126509203511.us-central1.run.app/
+- **Main Dashboard:** https://smart-stadium-126509203511.us-central1.run.app/dashboard
+- **Admin Panel:** https://smart-stadium-126509203511.us-central1.run.app/admin
+
+
 ## 🏁 Getting Started
 
 ### Prerequisites
 - Python 3.9+
 - Pip
+
+## Screen Shot:
+<img width="1919" height="895" alt="Screenshot 2026-04-15 205708" src="https://github.com/user-attachments/assets/a96b05f1-1fc5-489a-accc-b2ce3550534f" />
+<img width="1904" height="773" alt="Screenshot 2026-04-15 184110" src="https://github.com/user-attachments/assets/db09123a-c1ab-49ee-953c-eb987bf84b01" />
+
 
 ### Local Setup
 1. **Clone the repository:**
