@@ -56,8 +56,9 @@ StadiumIQ is a cutting-edge, real-time crowd management and navigation ecosystem
 - Pip
 
 ## Screenshot:
-<img width="1919" height="895" alt="Screenshot 2026-04-15 205708" src="https://github.com/user-attachments/assets/a96b05f1-1fc5-489a-accc-b2ce3550534f" />
-<img width="1904" height="773" alt="Screenshot 2026-04-15 184110" src="https://github.com/user-attachments/assets/db09123a-c1ab-49ee-953c-eb987bf84b01" />
+<img width="1895" height="880" alt="Screenshot 2026-04-15 223359" src="https://github.com/user-attachments/assets/192d1b02-5de4-4162-b2e2-7d7550c03119" />
+<img width="1919" height="889" alt="Screenshot 2026-04-15 223414" src="https://github.com/user-attachments/assets/d2c38462-d269-4540-a2b2-34970198afc6" />
+
 
 ### Local Setup
 1. **Clone & Navigate:**
