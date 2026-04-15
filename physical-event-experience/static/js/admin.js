@@ -1,6 +1,7 @@
 async function updateAdminStats() {
     try {
         const response = await fetch('/api/status');
+        if (!response.ok) throw new Error("Network offline");
         const data = await response.json();
 
         // Update Staff counts
@@ -8,19 +9,22 @@ async function updateAdminStats() {
         document.getElementById('avail-medical').textContent = data.staff.medical.available;
         document.getElementById('total-occ').textContent = data.occupancy.toLocaleString();
 
-        // Update Zone List
-        const zoneList = document.getElementById('zone-list');
-        zoneList.innerHTML = '';
-        
+        // Optimized Zone List Update (Flicker-Free)
+        const zoneListContainer = document.getElementById('zone-list');
         data.zones.forEach(zone => {
-            const item = document.createElement('div');
-            item.className = 'zone-control-item';
+            let row = zoneListContainer.querySelector(`[data-id="${zone.id}"]`);
+            if (!row) {
+                row = document.createElement('div');
+                row.className = 'zone-control-item';
+                row.setAttribute('data-id', zone.id);
+                zoneListContainer.appendChild(row);
+            }
             
             let color = 'white';
             if(zone.crowdLevel > 80) color = 'var(--danger)';
             else if(zone.crowdLevel > 50) color = 'var(--warning)';
 
-            item.innerHTML = `
+            row.innerHTML = `
                 <div class="zone-info">
                     <div style="font-weight:600; color:${color}">${zone.name}</div>
                     <div class="zone-meta">${zone.crowdLevel}% Capacity</div>
@@ -30,7 +34,6 @@ async function updateAdminStats() {
                     <button class="btn-primary btn-small" style="background:#1e293b;" onclick="dispatchStaff('${zone.id}', 'medical')">Send Medical</button>
                 </div>
             `;
-            zoneList.appendChild(item);
         });
 
     } catch (err) {
@@ -39,8 +42,12 @@ async function updateAdminStats() {
 }
 
 async function sendBroadcast(type) {
+    const btnGroup = document.querySelector('.btn-group');
     const msg = document.getElementById('broadcast-msg').value;
     if(!msg) return alert("Please type a message first.");
+
+    btnGroup.style.opacity = '0.5';
+    btnGroup.style.pointerEvents = 'none';
 
     try {
         const response = await fetch('/api/admin/broadcast', {
@@ -55,6 +62,9 @@ async function sendBroadcast(type) {
         }
     } catch (err) {
         alert("Failed to send broadcast.");
+    } finally {
+        btnGroup.style.opacity = '1';
+        btnGroup.style.pointerEvents = 'auto';
     }
 }
 
@@ -68,7 +78,6 @@ async function dispatchStaff(zoneId, staffType) {
         
         const resData = await response.json();
         if(resData.status === 'success') {
-            alert(`${staffType.charAt(0).toUpperCase() + staffType.slice(1)} unit dispatched!`);
             updateAdminStats();
         } else {
             alert(resData.message);
@@ -81,4 +90,6 @@ async function dispatchStaff(zoneId, staffType) {
 // Initial update and interval
 updateAdminStats();
 setInterval(updateAdminStats, 3000);
-if(window.lucide) lucide.createIcons();
+if(window.lucide) {
+    window.lucide.createIcons();
+}
