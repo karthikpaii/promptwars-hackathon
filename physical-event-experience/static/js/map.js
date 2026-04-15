@@ -1,11 +1,11 @@
 let stadiumMap;
 let gateMarkers = {};
 let zoneLayers = {};
+let amenityMarkers = {}; // NEW: Tracker for amenity labels
 let currentRouteLine = null;
-let lastKnownData = null; // Store latest crowds to calculate weights
+let lastKnownData = null; 
 
 // --- Graph Definition ---
-// Graph nodes by their logical name mapped to coords
 const mapNodes = {
     'Center': [51.504, -0.09],
     'NorthGate': [51.506, -0.09],
@@ -15,7 +15,10 @@ const mapNodes = {
     'FoodCourt': [51.505, -0.091],
     'MerchStand': [51.505, -0.088],
     'VIP': [51.503, -0.092],
-    'Restrooms': [51.5055, -0.089] // Added explicit nodes for restrooms
+    'Main Washroom': [51.5055, -0.089],
+    'North Washroom': [51.5065, -0.089],
+    'Pizza Stand': [51.5055, -0.0915],
+    'Drinks Tent': [51.5035, -0.0915]
 };
 
 // Edges list with connections and the ZONE they pass through.
@@ -27,13 +30,13 @@ const mapEdges = [
     { a: 'Center', b: 'FoodCourt', zone: 'zone-food', dist: 6 },
     { a: 'Center', b: 'VIP', zone: 'zone-vip', dist: 5 },
     { a: 'Center', b: 'MerchStand', zone: 'zone-merch', dist: 6 },
-    { a: 'Center', b: 'Restrooms', zone: null, dist: 7 },
+    { a: 'Center', b: 'Main Washroom', zone: null, dist: 7 },
     
     // Outer Ring paths to walk around the center
     { a: 'NorthGate', b: 'FoodCourt', zone: 'zone-nc', dist: 4 },
     { a: 'NorthGate', b: 'MerchStand', zone: 'zone-nc', dist: 4 },
     { a: 'EastGate', b: 'MerchStand', zone: null, dist: 5 },
-    { a: 'EastGate', b: 'Restrooms', zone: null, dist: 4 },
+    { a: 'EastGate', b: 'Main Washroom', zone: null, dist: 4 },
     { a: 'SouthGate', b: 'VIP', zone: 'zone-sc', dist: 4 },
     { a: 'WestGate', b: 'VIP', zone: null, dist: 5 },
     { a: 'WestGate', b: 'FoodCourt', zone: null, dist: 5 },
@@ -49,11 +52,6 @@ function initMap() {
         subdomains: 'abcd',
         maxZoom: 19
     }).addTo(stadiumMap);
-
-    // Add static Restroom Label
-    L.circleMarker(mapNodes['Restrooms'], { radius: 0, opacity: 0 }).addTo(stadiumMap)
-        .bindTooltip("Washroom / Restroom", { permanent: true, direction: 'center', className: 'map-label', opacity: 1 })
-        .openTooltip();
 }
 
 // --- Status Updates ---
@@ -61,24 +59,28 @@ function updateMap(data) {
     if (!stadiumMap) return;
     lastKnownData = data;
 
-    // Update Gates
+    // 1. Update Gates
     data.gates.forEach(gate => {
         const coords = getGateCoords(gate.id);
         if (!gateMarkers[gate.id]) {
             gateMarkers[gate.id] = L.circleMarker(coords, { radius: 8, weight: 2, color: '#fff', fillOpacity: 1 }).addTo(stadiumMap);
-            
-            // Explicit generic naming on creation (no hovered popup needed anymore)
-            gateMarkers[gate.id].bindTooltip(gate.name, {
-                permanent: true, direction: 'top', className: 'gate-label', opacity: 1, offset: [0, -10]
-            }).openTooltip();
         }
         
         const waitTime = gate.waitTimeMinutes;
         const color = waitTime > 20 ? '#ef4444' : (waitTime > 10 ? '#f59e0b' : '#10b981');
         gateMarkers[gate.id].setStyle({ fillColor: color });
+        
+        // Update tooltip with time!
+        if(!gateMarkers[gate.id].getTooltip()) {
+             gateMarkers[gate.id].bindTooltip(`${gate.name} (${waitTime}m)`, {
+                permanent: true, direction: 'top', className: 'gate-label', opacity: 1, offset: [0, -10]
+            }).openTooltip();
+        } else {
+             gateMarkers[gate.id].setTooltipContent(`${gate.name} (${waitTime}m)`);
+        }
     });
 
-    // Update Zones with smooth path transitions
+    // 2. Update Zones
     data.zones.forEach(zone => {
         const coords = getZoneCoords(zone.id);
         const color = zone.crowdLevel > 80 ? '#ef4444' : (zone.crowdLevel > 50 ? '#f59e0b' : '#10b981');
@@ -88,7 +90,6 @@ function updateMap(data) {
                 fillColor: color, color: color, weight: 2, fillOpacity: 0.4, className: 'smooth-transition-path'
             }).addTo(stadiumMap);
             
-            // Ensure permanent names visible on map!
             zoneLayers[zone.id].bindTooltip(zone.name, {
                 permanent: true, direction: 'center', className: 'map-label', opacity: 1
             });
@@ -96,6 +97,21 @@ function updateMap(data) {
             zoneLayers[zone.id].setStyle({ fillColor: color, color: color });
         }
     });
+
+    // 3. Update Amenities
+    if(data.amenities) {
+        data.amenities.forEach(amenity => {
+            const coords = mapNodes[amenity.name] || [51.504, -0.09];
+            if (!amenityMarkers[amenity.id]) {
+                amenityMarkers[amenity.id] = L.circleMarker(coords, { radius: 0, opacity: 0 }).addTo(stadiumMap);
+                amenityMarkers[amenity.id].bindTooltip(`${amenity.name} (${amenity.waitTimeMinutes}m wait)`, { 
+                    permanent: true, direction: 'center', className: 'map-label', opacity: 1 
+                }).openTooltip();
+            } else {
+                amenityMarkers[amenity.id].setTooltipContent(`${amenity.name} (${amenity.waitTimeMinutes}m wait)`);
+            }
+        });
+    }
 }
 
 // --- Routing System (Dijkstra) ---

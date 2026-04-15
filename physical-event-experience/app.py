@@ -21,6 +21,12 @@ simulation_state = {
         {"id": "zone-merch", "name": "Merch Stand", "crowdLevel": 78},
         {"id": "zone-vip", "name": "VIP Lounge", "crowdLevel": 35},
         {"id": "zone-main", "name": "Main Entrance", "crowdLevel": 55},
+    ],
+    "amenities": [
+        {"id": "am-rest-main", "name": "Main Washroom", "type": "restroom", "waitTimeMinutes": 2},
+        {"id": "am-rest-north", "name": "North Washroom", "type": "restroom", "waitTimeMinutes": 8},
+        {"id": "am-food-pizza", "name": "Pizza Stand", "type": "food", "waitTimeMinutes": 15},
+        {"id": "am-food-drinks", "name": "Drinks Tent", "type": "food", "waitTimeMinutes": 5},
     ]
 }
 
@@ -43,6 +49,28 @@ def advance_simulation():
         # Bounded between 10% and 98%
         zone["crowdLevel"] = max(10, min(98, zone["crowdLevel"] + drift))
 
+    # Drift amenities wait times (-2 to +2 minutes)
+    for num, amenity in enumerate(simulation_state["amenities"]):
+        drift = random.randint(-2, 2)
+        amenity["waitTimeMinutes"] = max(0, min(30, amenity["waitTimeMinutes"] + drift))
+        
+    # Occasional Random Global Emergency Alert
+    if "alerts" not in simulation_state:
+        simulation_state["alerts"] = []
+    
+    # Randomly clear alerts
+    if len(simulation_state["alerts"]) > 0 and random.random() < 0.2:
+        simulation_state["alerts"].pop(0)
+
+    # 10% chance to generate a global alert on a tick
+    if random.random() < 0.1 and len(simulation_state["alerts"]) == 0:
+        emergencies = [
+            {"id": str(time.time()), "message": "Medical personnel dispatched to Center Concourse.", "type": "danger"},
+            {"id": str(time.time()), "message": "Merch Stand temporarily closed for restocking.", "type": "warning"},
+            {"id": str(time.time()), "message": "Security incident near VIP Lounge. Avoid the area.", "type": "danger"},
+        ]
+        simulation_state["alerts"].append(random.choice(emergencies))
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -56,7 +84,9 @@ def status():
         "occupancy": simulation_state["occupancy"],
         "capacity": simulation_state["capacity"],
         "gates": simulation_state["gates"],
-        "zones": simulation_state["zones"]
+        "zones": simulation_state["zones"],
+        "amenities": simulation_state["amenities"],
+        "alerts": simulation_state.get("alerts", [])
     })
 
 if __name__ == "__main__":
