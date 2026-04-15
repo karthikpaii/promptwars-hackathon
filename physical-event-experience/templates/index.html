@@ -130,9 +130,9 @@
                         </div>
                     </div>
                     <div class="dashboard-panel glass-panel">
-                        <h2>Zone Crowd Density</h2>
-                        <div class="chart-container">
-                            <canvas id="zoneDensityChart"></canvas>
+                        <h2>Live Zone Status</h2>
+                        <div class="zone-list-container" id="zone-status-list">
+                            <!-- Dynamic rows will inject here -->
                         </div>
                     </div>
                 </div>
@@ -140,6 +140,34 @@
 
             <div class="view-container hidden" id="view-map">
                 <div class="map-wrapper glass-panel">
+                    <div class="map-routing-overlay glass-panel">
+                        <h3>Smart PathFinder</h3>
+                        <div class="route-select-group">
+                            <label>From</label>
+                            <select id="route-start">
+                                <option value="Center">Center Concourse</option>
+                                <option value="NorthGate">North Gate</option>
+                                <option value="SouthGate">South Gate</option>
+                                <option value="EastGate">East Gate</option>
+                                <option value="WestGate">West Gate</option>
+                                <option value="FoodCourt">Food Court</option>
+                                <option value="MerchStand">Merch Stand</option>
+                            </select>
+                        </div>
+                        <div class="route-select-group">
+                            <label>To</label>
+                            <select id="route-end">
+                                <option value="FoodCourt">Food Court</option>
+                                <option value="NorthGate">North Gate</option>
+                                <option value="SouthGate">South Gate</option>
+                                <option value="EastGate">East Gate</option>
+                                <option value="WestGate">West Gate</option>
+                                <option value="MerchStand">Merch Stand</option>
+                                <option value="Center">Center Concourse</option>
+                            </select>
+                        </div>
+                        <button id="btn-draw-route" class="btn-primary">Find Best Path</button>
+                    </div>
                     <div id="stadium-map"></div>
                 </div>
             </div>
