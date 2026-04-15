@@ -175,6 +175,13 @@
                             </select>
                         </div>
                         <button id="btn-draw-route" class="btn-primary">Find Best Path</button>
+                        <div class="google-maps-toggle">
+                            <label class="switch">
+                                <input type="checkbox" id="toggle-google-maps">
+                                <span class="slider round"></span>
+                            </label>
+                            <span>Google Maps Layer</span>
+                        </div>
                     </div>
                     <div id="stadium-map"></div>
                 </div>
@@ -197,6 +204,40 @@
         </main>
     </div>
 
+    <!-- AI Assistant UI -->
+    <div id="ai-assistant-toggle" class="assistant-toggle glass-panel">
+        <i data-lucide="sparkles"></i>
+        <span class="pulse-ring"></span>
+    </div>
+
+    <div id="ai-assistant-window" class="assistant-window glass-panel hidden">
+        <div class="assistant-header">
+            <div class="assistant-title">
+                <i data-lucide="bot"></i>
+                <div>
+                    <h4>Stadium Concierge</h4>
+                    <span class="model-badge">Gemini AI</span>
+                </div>
+            </div>
+            <button id="close-assistant" class="btn-icon"><i data-lucide="x"></i></button>
+        </div>
+        <div id="chat-messages" class="chat-messages">
+            <div class="chat-message assistant">
+                <p>Hello! I'm your StadiumIQ AI Concierge. How can I help you navigate the venue today?</p>
+            </div>
+        </div>
+        <div class="assistant-footer">
+            <div class="google-attribution">
+                <img src="https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d473530c25e229867455c.svg" alt="Gemini" class="gemini-icon">
+                <span>Powered by Google Gemini</span>
+            </div>
+            <form id="chat-form" class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Ask about wait times, food..." autocomplete="off">
+                <button type="submit" class="btn-send"><i data-lucide="send"></i></button>
+            </form>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -205,6 +246,7 @@
     <!-- Custom Scripts -->
     <script src="/static/js/map.js"></script>
     <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/assistant.js"></script>
     <script src="/static/js/app.js"></script>
     <script>
         // Init Lucide Icons

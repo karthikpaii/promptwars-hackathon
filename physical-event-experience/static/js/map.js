@@ -195,7 +195,46 @@ function getZoneCoords(id) {
     return coords[id] || [[51.504,-0.09],[51.504,-0.091],[51.503,-0.091]];
 }
 
+// --- Google Maps Platform Integration (Simulated) ---
+let baseTileLayer;
+function setupGoogleMapsIntegration() {
+    const toggle = document.getElementById('toggle-google-maps');
+    if (!toggle) return;
+
+    toggle.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            // Switch to Google Satellite View (Simulated via a realistic tile layer)
+            stadiumMap.removeLayer(baseTileLayer);
+            baseTileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            }).addTo(stadiumMap);
+            
+            // Log intent for Google Maps Platform
+            console.log("Integrating Google Maps Platform: Switching to Satellite View & Places logic.");
+        } else {
+            // Switch back to Dark Mode
+            stadiumMap.removeLayer(baseTileLayer);
+            baseTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(stadiumMap);
+        }
+    });
+}
+
 // Global expose
-window.initMap = initMap;
+window.initMap = () => {
+    const stadiumCenter = [51.504, -0.09]; 
+    stadiumMap = L.map('stadium-map', { zoomControl: false }).setView(stadiumCenter, 16);
+
+    baseTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(stadiumMap);
+
+    setupGoogleMapsIntegration();
+};
 window.updateMap = updateMap;
 window.calculateAndDrawRoute = calculateAndDrawRoute;

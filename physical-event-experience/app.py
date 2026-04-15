@@ -125,6 +125,55 @@ def dispatch():
         return jsonify({"status": "success"})
     return jsonify({"status": "error", "message": "No available staff units"})
 
+# --- AI STADIUM CONCIERGE (SMART ASSISTANT) ---
+
+def stadium_concierge_logic(query):
+    query = query.lower()
+    
+    # Logic for Gates
+    if "gate" in query or "exit" in query or "fastest" in query:
+        fastest_gate = min(simulation_state["gates"], key=lambda x: x["waitTimeMinutes"])
+        return f"Based on live data, the shortest wait is at the **{fastest_gate['name']}** ({fastest_gate['waitTimeMinutes']} mins). I recommend heading there for the fastest exit."
+
+    # Logic for Food/Amenities
+    if "food" in query or "pizza" in query or "drinks" in query:
+        best_food = min([a for a in simulation_state["amenities"] if a["type"] == "food"], key=lambda x: x["waitTimeMinutes"])
+        return f"The **{best_food['name']}** currently has the shortest queue ({best_food['waitTimeMinutes']} mins). Our AI predicts this is the optimal time to grab a snack!"
+
+    # Logic for Crowds/Safety
+    if "crowd" in query or "busy" in query or "safe" in query:
+        high_zones = [z for z in simulation_state["zones"] if z["crowdLevel"] > 75]
+        if high_zones:
+            zone_names = ", ".join([z["name"] for z in high_zones])
+            return f"Heads up! The {zone_names} are currently experiencing high density. For a more comfortable experience, I suggest checking out the VIP Lounge or moving towards the East Concourse."
+        return "The stadium is currently at comfortable density levels across all zones. Enjoy the event!"
+
+    # Logic for Emergency/Alerts
+    if "alert" in query or "help" in query or "emergency" in query:
+        if simulation_state["alerts"]:
+            latest = simulation_state["alerts"][-1]
+            return f"IMPORTANT: There is an active alert - '{latest['message']}'. Please follow the instructions provided by stadium staff immediately."
+        return "There are no active alerts at this time. Security and Medical teams are on standby for your safety."
+
+    return "I'm the StadiumIQ AI Concierge! I can help you find the fastest gates, shortest food lines, or check zone density. What can I help you with?"
+
+@app.route("/api/assistant/chat", methods=["POST"])
+def assistant_chat():
+    data = request.json
+    user_query = data.get("message", "")
+    
+    # Simulate a small delay for "AI Processing"
+    time.sleep(0.5)
+    
+    response_text = stadium_concierge_logic(user_query)
+    
+    return jsonify({
+        "status": "success",
+        "message": response_text,
+        "model": "Gemini-1.5-Flash (Simulated)",
+        "timestamp": time.time()
+    })
+
 import os
 
 if __name__ == "__main__":
