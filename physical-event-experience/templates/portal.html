@@ -163,8 +163,8 @@
     <div class="portal-glow"></div>
     
     <div class="portal-container">
-        <header class="portal-header">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;">
+        <header class="portal-header" role="banner">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;" aria-hidden="true">
                 <i data-lucide="zap" style="width:48px; height:48px; color: #3b82f6;"></i>
                 <span style="font-size: 2rem; font-weight: 800; color: white;">StadiumIQ</span>
             </div>
@@ -172,10 +172,10 @@
             <p>Welcome to the ultimate real-time crowd management ecosystem. Select an interface to begin exploration.</p>
         </header>
 
-        <main class="portal-grid">
+        <main class="portal-grid" role="main" aria-label="Portal Options">
             <!-- Attendee Card -->
-            <a href="/dashboard" class="portal-card" style="animation-delay: 0.1s;">
-                <div class="icon-wrapper">
+            <a href="/dashboard" class="portal-card" style="animation-delay: 0.1s;" aria-label="Open Attendee Dashboard">
+                <div class="icon-wrapper" aria-hidden="true">
                     <i data-lucide="users" style="width:40px; height:40px;"></i>
                 </div>
                 <h2>Attendee Dashboard</h2>
@@ -186,8 +186,8 @@
             </a>
 
             <!-- Admin Card -->
-            <a href="/admin" class="portal-card card-admin" style="animation-delay: 0.2s;">
-                <div class="icon-wrapper">
+            <a href="/admin" class="portal-card card-admin" style="animation-delay: 0.2s;" aria-label="Open Admin Command Center">
+                <div class="icon-wrapper" aria-hidden="true">
                     <i data-lucide="shield" style="width:40px; height:40px;"></i>
                 </div>
                 <h2>Command Center</h2>
@@ -198,7 +198,7 @@
             </a>
         </main>
 
-        <footer style="margin-top: 4rem; color: #475569; font-size: 0.9rem;">
+        <footer style="margin-top: 4rem; color: #475569; font-size: 0.9rem;" role="contentinfo">
             &copy; 2026 StadiumIQ Smart Venue Solution. Built for the Future of Sporting Events.
         </footer>
     </div>

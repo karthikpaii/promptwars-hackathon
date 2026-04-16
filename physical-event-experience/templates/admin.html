@@ -6,6 +6,8 @@
     <title>Admin Control Center - StadiumIQ</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Security: CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         .admin-layout {
             padding: 2rem;
@@ -105,16 +107,16 @@
         <div class="admin-grid">
             <div class="control-panel">
                 <!-- Manual Broadcast -->
-                <div class="admin-card glass-panel">
-                    <h3>Manual Broadcast Alert</h3>
+                <section class="admin-card glass-panel" aria-labelledby="broadcast-title">
+                    <h3 id="broadcast-title">Manual Broadcast Alert</h3>
                     <p class="subtitle">Type a message to send a live notification to all users.</p>
-                    <textarea id="broadcast-msg" rows="4" placeholder="Enter message here..."></textarea>
-                    <div class="btn-group">
-                        <button class="btn-primary" onclick="sendBroadcast('info')">Send Info</button>
-                        <button class="btn-primary" style="background:var(--warning);" onclick="sendBroadcast('warning')">Send Warning</button>
-                        <button class="btn-primary" style="background:var(--danger);" onclick="sendBroadcast('danger')">Send Emergency</button>
+                    <textarea id="broadcast-msg" rows="4" placeholder="Enter message here..." aria-label="Alert message content"></textarea>
+                    <div class="btn-group" role="group" aria-label="Broadcast alert types">
+                        <button class="btn-primary" onclick="sendBroadcast('info')" aria-label="Send information alert">Send Info</button>
+                        <button class="btn-primary" style="background:var(--warning);" onclick="sendBroadcast('warning')" aria-label="Send warning alert">Send Warning</button>
+                        <button class="btn-primary" style="background:var(--danger);" onclick="sendBroadcast('danger')" aria-label="Send emergency alert">Send Emergency</button>
                     </div>
-                </div>
+                </section>
             </div>
 
             <div class="zone-dispatch glass-panel admin-card">

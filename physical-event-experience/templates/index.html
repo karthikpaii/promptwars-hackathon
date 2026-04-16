@@ -13,6 +13,9 @@
     
     <!-- Custom Styles -->
     <link rel="stylesheet" href="/static/css/style.css">
+    
+    <!-- Security: CSRF Token for AJAX requests -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="dark-theme">
     
@@ -21,13 +24,13 @@
 
     <div class="app-layout">
         <!-- Sidebar / Bottom Nav -->
-        <nav class="main-nav">
+        <nav class="main-nav" role="navigation" aria-label="Main Navigation">
             <div class="nav-brand">
                 <i data-lucide="zap"></i>
                 <span class="brand-text">StadiumIQ</span>
             </div>
             <ul class="nav-links">
-                <li class="active"><a href="#" id="tab-dashboard"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+                <li class="active"><a href="#" id="tab-dashboard" aria-current="page"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
                 <li><a href="#" id="tab-map"><i data-lucide="map"></i><span>Map View</span></a></li>
                 <li><a href="#" id="tab-alerts"><i data-lucide="bell"></i><span>Alerts</span></a></li>
             </ul>
@@ -55,19 +58,19 @@
                 <div class="kpi-grid">
                     
                     <!-- Crowd Density Card -->
-                    <div class="kpi-card glass-panel interactive-card">
+                    <section class="kpi-card glass-panel interactive-card" aria-labelledby="density-title">
                         <div class="kpi-header">
-                            <div class="kpi-icon"><i data-lucide="users"></i></div>
-                            <h3>Crowd Density</h3>
+                            <div class="kpi-icon"><i data-lucide="users" aria-hidden="true"></i></div>
+                            <h3 id="density-title">Crowd Density</h3>
                         </div>
                         <div class="kpi-body">
                             <div class="kpi-value"><span id="kpi-occupancy">--</span> <span class="kpi-subtext">/ <span id="kpi-capacity">--</span></span></div>
-                            <div class="progress-bar-container">
+                            <div class="progress-bar-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="density-progress-container">
                                 <div class="progress-bar" id="density-bar"></div>
                             </div>
                             <p class="kpi-hint" id="density-hint">Calculating...</p>
                         </div>
-                    </div>
+                    </section>
 
                     <!-- Shortest Wait Time Card -->
                     <div class="kpi-card glass-panel interactive-card">
@@ -205,23 +208,23 @@
     </div>
 
     <!-- AI Assistant UI -->
-    <div id="ai-assistant-toggle" class="assistant-toggle glass-panel">
+    <button id="ai-assistant-toggle" class="assistant-toggle glass-panel" aria-label="Open AI Assistant" aria-haspopup="true">
         <i data-lucide="sparkles"></i>
         <span class="pulse-ring"></span>
-    </div>
+    </button>
 
-    <div id="ai-assistant-window" class="assistant-window glass-panel hidden">
+    <div id="ai-assistant-window" class="assistant-window glass-panel hidden" role="dialog" aria-labelledby="assistant-title">
         <div class="assistant-header">
             <div class="assistant-title">
-                <i data-lucide="bot"></i>
+                <i data-lucide="bot" aria-hidden="true"></i>
                 <div>
-                    <h4>Stadium Concierge</h4>
+                    <h4 id="assistant-title">Stadium Concierge</h4>
                     <span class="model-badge">Gemini AI</span>
                 </div>
             </div>
-            <button id="close-assistant" class="btn-icon"><i data-lucide="x"></i></button>
+            <button id="close-assistant" class="btn-icon" aria-label="Close assistant"><i data-lucide="x"></i></button>
         </div>
-        <div id="chat-messages" class="chat-messages">
+        <div id="chat-messages" class="chat-messages" aria-live="polite">
             <div class="chat-message assistant">
                 <p>Hello! I'm your StadiumIQ AI Concierge. How can I help you navigate the venue today?</p>
             </div>
@@ -232,8 +235,8 @@
                 <span>Powered by Google Gemini</span>
             </div>
             <form id="chat-form" class="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Ask about wait times, food..." autocomplete="off">
-                <button type="submit" class="btn-send"><i data-lucide="send"></i></button>
+                <input type="text" id="chat-input" placeholder="Ask about wait times, food..." autocomplete="off" aria-label="Ask the AI Concierge">
+                <button type="submit" class="btn-send" aria-label="Send message"><i data-lucide="send"></i></button>
             </form>
         </div>
     </div>

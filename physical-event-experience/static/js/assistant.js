@@ -32,9 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const typingId = showTyping();
 
         try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             const response = await fetch('/api/assistant/chat', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
                 body: JSON.stringify({ message })
             });
             const data = await response.json();

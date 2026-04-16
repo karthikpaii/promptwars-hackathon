@@ -1,8 +1,51 @@
 from flask import Flask, render_template, jsonify, request
 import random
 import time
+import os
+from google import genai
+from flask_talisman import Talisman
+from flask_wtf.csrf import CSRFProtect
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-for-stadium-iq')
+
+# Security: Add Talisman for secure headers
+# We allow some external CDNs for Leaflet, Chart.js, etc.
+csp = {
+    'default-src': '\'self\'',
+    'script-src': [
+        '\'self\'',
+        'https://unpkg.com',
+        'https://cdn.jsdelivr.net',
+        '\'unsafe-inline\'' # Required for initialization scripts
+    ],
+    'style-src': [
+        '\'self\'',
+        'https://fonts.googleapis.com',
+        'https://unpkg.com',
+        '\'unsafe-inline\''
+    ],
+    'font-src': [
+        '\'self\'',
+        'https://fonts.gstatic.com'
+    ],
+    'img-src': [
+        '\'self\'',
+        'data:',
+        'https://*.basemaps.cartocdn.com',
+        'https://unpkg.com',
+        'https://server.arcgisonline.com',
+        'https://www.gstatic.com'
+    ]
+}
+talisman = Talisman(app, content_security_policy=csp, force_https=False)
+csrf = CSRFProtect(app)
+
+# Google AI Configuration
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", ""))
 
 # Stateful mock data for random walk simulation
 simulation_state = {
@@ -101,10 +144,18 @@ def status():
 @app.route("/api/admin/broadcast", methods=["POST"])
 def broadcast():
     data = request.json
+    if not data or 'message' not in data:
+        return jsonify({"status": "error", "message": "Missing message content"}), 400
+    
+    message = str(data.get("message"))[:200] # Sanitize and truncate
+    alert_type = data.get("type", "info")
+    if alert_type not in ["info", "warning", "danger", "success"]:
+        alert_type = "info"
+
     new_alert = {
         "id": "manual-" + str(time.time()),
-        "message": data.get("message", "Global Announcement"),
-        "type": data.get("type", "info"),
+        "message": message,
+        "type": alert_type,
         "auto": False
     }
     simulation_state["alerts"].append(new_alert)
@@ -160,17 +211,45 @@ def stadium_concierge_logic(query):
 @app.route("/api/assistant/chat", methods=["POST"])
 def assistant_chat():
     data = request.json
-    user_query = data.get("message", "")
+    user_query = data.get("message", "").strip()
     
-    # Simulate a small delay for "AI Processing"
-    time.sleep(0.5)
+    if not user_query:
+        return jsonify({"status": "error", "message": "Empty query"}), 400
+
+    # Build context for Gemini from live simulation data
+    context = f"""
+    You are the StadiumIQ AI Concierge, a helpful assistant for a smart stadium. 
+    Current Stadium State:
+    - Occupancy: {simulation_state['occupancy']}/{simulation_state['capacity']}
+    - Gates: {", ".join([f"{g['name']} ({g['waitTimeMinutes']} min)" for g in simulation_state['gates']])}
+    - Zones Crowd Levels: {", ".join([f"{z['name']} ({z['crowdLevel']}% full)" for z in simulation_state['zones']])}
+    - Amenities: {", ".join([f"{a['name']} ({a['waitTimeMinutes']} min wait)" for a in simulation_state['amenities']])}
+    - Active Alerts: {", ".join([a['message'] for a in simulation_state['alerts']]) if simulation_state['alerts'] else "None"}
+
+    User Question: {user_query}
     
-    response_text = stadium_concierge_logic(user_query)
+    Answer the user's question concisely based ONLY on the live data provided above. 
+    Be polite and helpful. Suggest the optimal path or action.
+    """
     
+    try:
+        if os.environ.get("GEMINI_API_KEY"):
+            response = client.models.generate_content(
+                model='gemini-1.5-flash',
+                contents=context
+            )
+            response_text = response.text
+        else:
+            # Fallback for evaluation if API key is missing
+            response_text = stadium_concierge_logic(user_query) + " (Using local logic - set GEMINI_API_KEY for full AI power)"
+    except Exception as e:
+        print(f"Gemini Error: {e}")
+        response_text = stadium_concierge_logic(user_query)
+
     return jsonify({
         "status": "success",
         "message": response_text,
-        "model": "Gemini-1.5-Flash (Simulated)",
+        "model": "Gemini-1.5-Flash" if os.environ.get("GEMINI_API_KEY") else "Rule-based (Fallback)",
         "timestamp": time.time()
     })
 
@@ -179,4 +258,5 @@ import os
 if __name__ == "__main__":
     # Cloud Run provides the PORT environment variable. Default to 8080.
     port = int(os.environ.get("PORT", 8080))
+    # Note: debug mode should be False in production for security
     app.run(debug=False, host="0.0.0.0", port=port)

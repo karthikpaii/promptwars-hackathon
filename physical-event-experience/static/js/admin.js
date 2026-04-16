@@ -43,9 +43,13 @@ async function sendBroadcast(type) {
     if(!msg) return alert("Please type a message first.");
 
     try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const response = await fetch('/api/admin/broadcast', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify({ message: msg, type: type })
         });
         
@@ -60,9 +64,13 @@ async function sendBroadcast(type) {
 
 async function dispatchStaff(zoneId, staffType) {
     try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const response = await fetch('/api/admin/dispatch', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify({ zone_id: zoneId, type: staffType })
         });
         
