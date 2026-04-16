@@ -86,6 +86,9 @@ We have significantly enhanced the project to meet and exceed judging criteria:
 
 ---
 
+## My Hackathon Rank:
+<img width="1047" height="384" alt="image" src="https://github.com/user-attachments/assets/11284598-f8d7-4221-92c9-9c302657a948" />
+
 ## 📂 Project Structure
 
 ```text
@@ -105,3 +108,5 @@ physical-event-experience/
 
 ## 📄 License
 This project was developed for the PromptWars Hackathon 2026. All rights reserved.
+
+
