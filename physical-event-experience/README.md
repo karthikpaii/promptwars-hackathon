@@ -52,9 +52,7 @@ We have significantly enhanced the project to meet and exceed judging criteria:
 ---
 
 ## Demo 🌐
-- **Home Page:** https://smart-stadium-126509203511.us-central1.run.app/
-- **Main Dashboard:** https://smart-stadium-126509203511.us-central1.run.app/dashboard
-- **Admin Panel:** https://smart-stadium-126509203511.us-central1.run.app/admin
+- **Home Page:** https://stadium-iq-126509203511.us-central1.run.app/
 
 
 ## 🏁 Getting Started
